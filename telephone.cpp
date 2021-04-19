@@ -9,17 +9,20 @@ class node {
   public :
     // for persons info
     string name, email;
-    long long mob_number;
+    string mob_number;
 
     // for node info
     node *parent, *left, *right;
     bool color;
 
     // constructor...
-    node (string R_name, long long R_mob_number, string R_email);
+    node (string R_name, string R_mob_number, string R_email);
+    node* sibling();
+    bool isOnLeft();
+    bool hasRedChild();
 };
 
-node :: node (string R_name, long long R_mob_number, string R_email) {
+node :: node (string R_name, string R_mob_number, string R_email) {
     // initialize the basic info
     name = R_name;
     mob_number = R_mob_number;
@@ -52,6 +55,9 @@ class RedBlackTree {
     node* Search (node *root, string key);
     // to modify the records
     void Modify (string key);
+    // to delete a record
+    void Delete (node *v);
+    void fixDoubleBlack (node* v);
     // to print all records
     void printDirectory(node *root);
 };
@@ -238,7 +244,7 @@ node* RedBlackTree :: Search (node *root, string key) {
 
 // to modify records
 void RedBlackTree :: Modify (string key) {
-    long long n;  // to store new number
+    string n;  // to store new number
     string e;
     // a dummy node to store search results
     node *dummy = Search (root, key);
@@ -261,6 +267,182 @@ void RedBlackTree :: Modify (string key) {
     }
 }
 
+bool node :: hasRedChild() {
+    return (left != NULL and left->color == red) || (right != NULL and right->color == red);
+}
+
+bool node :: isOnLeft() {
+    return this == parent->left;
+}
+
+node* node :: sibling() {
+    // sibling null if no parent
+    if (parent == NULL)
+      return NULL;
+ 
+    if (isOnLeft())
+      return parent->right;
+ 
+    return parent->left;
+  }
+
+node *successor(node *x) {
+    node *temp = x;
+ 
+    while (temp->left != NULL)
+      temp = temp->left;
+ 
+    return temp;
+  }
+
+node *BSTreplace(node *x) {
+    // when node have 2 children
+    if (x->left != NULL and x->right != NULL)
+      return successor(x->right);
+ 
+    // when leaf
+    if (x->left == NULL and x->right == NULL)
+      return NULL;
+ 
+    // when single child
+    if (x->left != NULL)
+      return x->left;
+    else
+      return x->right;
+  }
+
+void RedBlackTree :: fixDoubleBlack(node *x) {
+    if (x == root)
+      // Reached root
+      return;
+ 
+    node *sibling = x->sibling(), *parent = x->parent;
+    if (sibling == NULL) {
+      // No sibiling, double black pushed up
+      fixDoubleBlack(parent);
+    } else {
+      if (sibling->color == red) {
+        // Sibling red
+        parent->color = red;
+        sibling->color = black;
+        if (sibling->isOnLeft()) {
+          // left case
+          rotateRight(root, parent);
+        } else {
+          // right case
+          rotateLeft(root, parent);
+        }
+        fixDoubleBlack(x);
+      } else {
+        // Sibling black
+        if (sibling->hasRedChild()) {
+          // at least 1 red children
+          if (sibling->left != NULL and sibling->left->color == red) {
+            if (sibling->isOnLeft()) {
+              // left left
+              sibling->left->color = sibling->color;
+              sibling->color = parent->color;
+              rotateRight(root, parent);
+            } else {
+              // right left
+              sibling->left->color = parent->color;
+              rotateRight(root, sibling);
+              rotateLeft(root, parent);
+            }
+          } else {
+            if (sibling->isOnLeft()) {
+              // left right
+              sibling->right->color = parent->color;
+              rotateLeft(root, sibling);
+              rotateRight(root, parent);
+            } else {
+              // right right
+              sibling->right->color = sibling->color;
+              sibling->color = parent->color;
+              rotateLeft(root, parent);
+            }
+          }
+          parent->color = black;
+        } else {
+          // 2 black children
+          sibling->color = red;
+          if (parent->color == black)
+            fixDoubleBlack(parent);
+          else
+            parent->color = black;
+        }
+      }
+    }
+  }
+
+// to delete the record
+void RedBlackTree :: Delete (node *v) {
+    node *u = BSTreplace(v);
+ 
+    // True when u and v are both black
+    bool uvBlack = ((u == NULL or u->color == black) and (v->color == black));
+    node *parent = v->parent;
+ 
+    if (u == NULL) {
+      // u is NULL therefore v is leaf
+      if (v == root) {
+        // v is root, making root null
+        root = NULL;
+      } else {
+        if (uvBlack) {
+          // u and v both black
+          // v is leaf, fix double black at v
+          fixDoubleBlack(v);
+        } else {
+          // u or v is red
+          if (v->sibling() != NULL)
+            // sibling is not null, make it red"
+            v->sibling()->color = red;
+        }
+ 
+        // delete v from the tree
+        if (v->isOnLeft()) {
+          parent->left = NULL;
+        } else {
+          parent->right = NULL;
+        }
+      }
+      delete v;
+      return;
+    }
+ 
+    if (v->left == NULL or v->right == NULL) {
+      // v has 1 child
+      if (v == root) {
+        // v is root, assign the value of u to v, and delete u
+        v->name = u->name;
+        v->left = v->right = NULL;
+        delete u;
+      } else {
+        // Detach v from tree and move u up
+        if (v->isOnLeft()) {
+          parent->left = u;
+        } else {
+          parent->right = u;
+        }
+        delete v;
+        u->parent = parent;
+        if (uvBlack) {
+          // u and v both black, fix double black at u
+          fixDoubleBlack(u);
+        } else {
+          // u or v red, color u black
+          u->color = black;
+        }
+      }
+      return;
+    }
+ 
+    // v has 2 children, swap values with successor and recurse
+    swap (u, v);
+    Delete(u);
+}
+
 // to print whole telephone directory
 void RedBlackTree :: printDirectory(node *r) {
     if (r) {
@@ -276,8 +458,9 @@ int menu () {
             "\n|  1. Insert entries.  |"
             "\n|  2. Search entries.  |"
             "\n|  3. Modify entries.  |"
-            "\n|  4. Print directory  |"
-            "\n|  5. Exit.            |"
+            "\n|  4. Print directory. |"
+            "\n|  5. Delete entries.  |"
+            "\n|  6. Exit.            |"
             "\n ~~~~~~~~~~~~~~~~~~~~~~"
             "\n      Choice : ";
     cin >> x;
@@ -289,14 +472,14 @@ int main () {
     RedBlackTree obj;
     // to take entries of names and numbers
     string name, email;
-    long long number;
-    node *dummy, *searchResult;
+    string number;
+    node *dummy, *searchResult, *random;
     // the loop goes here
     while (1) {
         switch (menu()) {
             case 1 :
                 cout << "\n  Enter the Name : ";
-                getline(cin, name);
+                cin >> name;
                 cout << "  Enter the Number : ";
                 cin >> number;
                 cout << "  Enter the Email : ";
@@ -339,6 +522,20 @@ int main () {
                 }
                 break;
             case 5 :
+                cout << "\n  Enter the name to delete : ";
+                cin >> name;
+                random = obj.Search (obj.root, name);
+                if ( !random ) {
+                    cout << "\n  Alert!!!"
+                            "\n  No Element found." << endl;
+                }
+                else {
+                    cout << "\n  Record found!!!";
+                    obj.Delete(random);
+                    cout << "\n  Entry Deleted!!\n";
+                }
+                break;
+            case 6 :
                 cout << "\n____THANKS FOR USING____" << endl;
                 exit(0);
             default :
