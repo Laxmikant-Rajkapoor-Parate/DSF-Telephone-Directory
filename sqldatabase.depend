@@ -1,0 +1,80 @@
+# depslib dependency file v1.0
+1618834979 source:c:\users\abc\desktop\sqldatabase\main.cpp
+	<mysql.h>
+	<windows.h>
+	<bits/stdc++.h>
+	<cstring>
+
+1476071734 c:\program files\dev-cpp\mingw64\include\mysql.h
+	<sys/types.h>
+	<winsock.h>
+	"mysql_com.h"
+	"mysql_time.h"
+	"mysql_version.h"
+	"typelib.h"
+	"my_list.h"
+	"my_alloc.h"
+
+1476071748 c:\program files\dev-cpp\mingw64\include\mysql_com.h
+
+1476071774 c:\program files\dev-cpp\mingw64\include\mysql_time.h
+
+1476071784 c:\program files\dev-cpp\mingw64\include\mysql_version.h
+	<custom_conf.h>
+
+1476071924 c:\program files\dev-cpp\mingw64\include\typelib.h
+
+1476071970 c:\program files\dev-cpp\mingw64\include\my_list.h
+
+1476071978 c:\program files\dev-cpp\mingw64\include\my_alloc.h
+
+1607652740 c:\program files\mysql\mysql server 8.0\include\mysql.h
+	<stdbool.h>
+	<stddef.h>
+	<stdint.h>
+	<sys/types.h>
+	<windows.h>
+	<winsock2.h>
+	"field_types.h"
+	"my_list.h"
+	"mysql_com.h"
+	"mysql/client_plugin.h"
+	"mysql_version.h"
+	"mysql_time.h"
+	"errmsg.h"
+
+1607652740 c:\program files\mysql\mysql server 8.0\include\field_types.h
+
+1607652740 c:\program files\mysql\mysql server 8.0\include\my_list.h
+
+1607652740 c:\program files\mysql\mysql server 8.0\include\mysql_com.h
+	<stdbool.h>
+	<stdint.h>
+	"my_command.h"
+	"my_compress.h"
+	"my_io.h"
+	"mysql/components/services/my_io_bits.h"
+	<stdbool.h>
+	"mysql/udf_registration_types.h"
+
+1607652740 c:\program files\mysql\mysql server 8.0\include\my_command.h
+
+1607652740 c:\program files\mysql\mysql server 8.0\include\my_compress.h
+
+1607652740 c:\program files\mysql\mysql server 8.0\include\mysql\udf_registration_types.h
+	<stdbool.h>
+
+1607652740 c:\program files\mysql\mysql server 8.0\include\mysql\client_plugin.h
+	<stdarg.h>
+	<stdlib.h>
+	"plugin_auth_common.h"
+
+1607652740 c:\program files\mysql\mysql server 8.0\include\mysql\plugin_auth_common.h
+	<windows.h>
+
+1607656314 c:\program files\mysql\mysql server 8.0\include\mysql_version.h
+
+1607652740 c:\program files\mysql\mysql server 8.0\include\mysql_time.h
+
+1607652740 c:\program files\mysql\mysql server 8.0\include\errmsg.h
+
